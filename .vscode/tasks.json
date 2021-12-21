@@ -3,12 +3,12 @@
         {
             "type": "shell",
             "label": "C/C++: g++.exe build active file",
-            "command": "C:\\TDM-GCC-64\\bin\\g++.exe",
+            "command": "g++",
             "args": [
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "${fileDirname}/${fileBasenameNoExtension}.exe",
                 "-std=c++11"
             ],
             "options": {
@@ -20,7 +20,7 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
         }
     ],
     "version": "2.0.0"
