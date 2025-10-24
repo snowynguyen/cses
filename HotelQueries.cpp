@@ -1,73 +1,60 @@
 #include <bits/stdc++.h>
 using namespace std;
+const int INF = 1e8;
 
-const int N = 200005;
+struct TSegmentTree {
+    int n; vector<int> f;
 
-int n, a[N];
+    TSegmentTree(int n): n(n) {
+        f.assign(4*n, 0);
+    }
 
-struct TSegmentTree 
-{
-    int f[N * 4];
-
-    void init(int id, int l, int r) 
-    {
-        if (l == r) 
-            f[id] = a[l];
-        else 
-        {
-            int m = (l + r ) / 2;
-            init(id * 2, l, m);
-            init(id * 2 + 1, m + 1, r);
-            f[id] = max(f[id*2], f[id * 2 + 1]);
+    void update(int id, int l, int r, int p, int delta) {
+        if (r < p || p < l) return;
+        if (l == r) {
+            f[id] += delta; 
+        } else {
+            int m = (l + r) / 2; 
+            update(id * 2, l, m, p, delta);
+            update(id * 2 + 1, m + 1, r, p, delta); 
+            f[id] = max(f[id * 2], f[id * 2 + 1]);
         }
     }
 
-    void update (int id, int l, int r, int p, int delta) 
-    {
-        if (r < p || p < l) 
-            return;
-        if (l == r) 
-            f[id] += delta;
-        else 
-        {
-            int m = (l + r ) / 2;
-            update (id * 2, l,m, p ,delta);
-            update (id*2+1, m+1, r, p, delta);
-            f[id] = max(f[id*2], f[id * 2+1]);
-        } 
+    void update(int p, int delta) {
+        update(1, 1, n, p, delta);
     }
 
-    int walk(int id, int l, int r, int x) 
-    {
-        if (l == r) 
-        {
-            if (f[id] < x) 
-                return 0;
+    int walkLeft(int id, int l, int r, int value) {
+        if (l == r) {
+            if (f[id] < value) 
+                return INF;
             return l;
         }
-        int m = ( l + r) / 2;
-        if (f[id * 2] >= x) 
-            return walk(id*2, l, m, x);
-        return walk(id * 2+1, m+1, r, x);
+        if (f[id] < value) 
+            return INF; 
+        int m = (l + r) / 2;
+        if (f[id * 2] >= value) 
+            return walkLeft(id * 2, l, m, value);
+        return walkLeft(id * 2 + 1, m + 1, r, value);
     }
-} st;
+};
 
-int main() 
-{
-    ios_base::sync_with_stdio(0);
-    int m;
-    cin >> n >> m;
-    for (int i=1; i<=n; ++i) 
+int main() {
+    ios_base::sync_with_stdio(0); cin.tie(0);
+    int n,m; cin >> n >> m;
+    TSegmentTree st(n);
+    vector<int> a(n + 1);
+    for (int i=1; i<=n; ++i) {
         cin >> a[i];
-    st.init(1, 1, n);
-    for (int u, v,  i=1; i<=m; ++i) 
-    {
-        cin >> u;
-        v = st.walk(1, 1, n, u);
-        if (v > 0) 
-        {
-            st.update(1, 1, n, v, -u);
-        }
-        cout << v << " ";
+        st.update(i, a[i]);
+    }
+    for (int i=1, x, y; i<=m; ++i) {
+        cin >> x;
+        y = st.walkLeft(1, 1, n, x);
+        if (y == INF) 
+            y = 0;
+        cout << y << ' ';
+        st.update(y, -x);
     }
 }
